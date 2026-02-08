@@ -1,0 +1,571 @@
+/* ═══════════════════════════════════════════════════════════════
+   LA QUENTO – ROLL THE BALL | Design System
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── CSS Custom Properties ─── */
+:root {
+    /* Colors */
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #12121a;
+    --bg-tertiary: #1a1a26;
+    
+    /* Accent Colors */
+    --cyan-glow: #00ffcc;
+    --cyan-dim: #00b894;
+    --magenta-glow: #ff3366;
+    --magenta-dim: #b82e4f;
+    --green-glow: #00ff88;
+    --green-dim: #00b35c;
+    --gold-glow: #ffd700;
+    
+    /* UI Colors */
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --text-muted: rgba(255, 255, 255, 0.4);
+    
+    /* Wall Colors */
+    --wall-fill: #1a1a26;
+    --wall-stroke: #2a2a3a;
+    --wall-glow: rgba(0, 255, 204, 0.1);
+    
+    /* Shadows & Glows */
+    --glow-cyan: 0 0 20px rgba(0, 255, 204, 0.5);
+    --glow-magenta: 0 0 20px rgba(255, 51, 102, 0.5);
+    --glow-green: 0 0 20px rgba(0, 255, 136, 0.5);
+    
+    /* Typography */
+    --font-display: 'Orbitron', sans-serif;
+    --font-body: 'Rajdhani', sans-serif;
+    
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 4rem;
+    
+    /* Transitions */
+    --transition-fast: 150ms ease;
+    --transition-normal: 300ms ease;
+    --transition-slow: 500ms ease;
+}
+
+/* ─── Reset & Base ─── */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: var(--font-body);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ─── Game Container ─── */
+#game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    max-width: 1200px;
+    max-height: 800px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* ─── Ambient Effects ─── */
+.ambient-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 150%;
+    height: 150%;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(0, 255, 204, 0.03) 0%,
+        rgba(0, 255, 204, 0.01) 30%,
+        transparent 70%
+    );
+    pointer-events: none;
+    animation: ambientPulse 8s ease-in-out infinite;
+}
+
+@keyframes ambientPulse {
+    0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+.grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(0, 255, 204, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 204, 0.02) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* ─── Canvas ─── */
+#gameCanvas {
+    position: relative;
+    z-index: 1;
+    border-radius: 4px;
+    box-shadow: 
+        0 0 0 1px rgba(0, 255, 204, 0.2),
+        0 0 40px rgba(0, 255, 204, 0.1),
+        inset 0 0 60px rgba(0, 0, 0, 0.5);
+}
+
+/* ─── UI Overlay ─── */
+#ui-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* ─── Screens ─── */
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(10, 10, 15, 0.95);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-slow), visibility var(--transition-slow);
+    pointer-events: auto;
+}
+
+.screen.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* ─── Start Screen ─── */
+#start-screen {
+    background: linear-gradient(
+        180deg,
+        rgba(10, 10, 15, 0.98) 0%,
+        rgba(10, 10, 15, 0.95) 50%,
+        rgba(10, 10, 15, 0.98) 100%
+    );
+}
+
+.logo-container {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.logo {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    font-weight: 900;
+    letter-spacing: 0.3em;
+    color: var(--text-primary);
+    text-shadow: 
+        0 0 10px rgba(0, 255, 204, 0.5),
+        0 0 30px rgba(0, 255, 204, 0.3),
+        0 0 50px rgba(0, 255, 204, 0.2);
+    animation: logoGlow 3s ease-in-out infinite;
+}
+
+@keyframes logoGlow {
+    0%, 100% { 
+        text-shadow: 
+            0 0 10px rgba(0, 255, 204, 0.5),
+            0 0 30px rgba(0, 255, 204, 0.3),
+            0 0 50px rgba(0, 255, 204, 0.2);
+    }
+    50% { 
+        text-shadow: 
+            0 0 20px rgba(0, 255, 204, 0.7),
+            0 0 40px rgba(0, 255, 204, 0.5),
+            0 0 60px rgba(0, 255, 204, 0.3);
+    }
+}
+
+.subtitle {
+    font-family: var(--font-display);
+    font-size: clamp(0.8rem, 2vw, 1.2rem);
+    font-weight: 400;
+    letter-spacing: 0.5em;
+    color: var(--cyan-glow);
+    margin-top: var(--spacing-md);
+}
+
+.menu-content {
+    text-align: center;
+}
+
+.instruction {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-md);
+}
+
+.instruction.pulse {
+    animation: textPulse 2s ease-in-out infinite;
+}
+
+@keyframes textPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.controls-hint {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.key {
+    display: inline-block;
+    padding: 0.2em 0.6em;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--cyan-dim);
+    border-radius: 4px;
+    font-family: var(--font-display);
+    font-size: 0.9em;
+    color: var(--cyan-glow);
+    box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
+}
+
+.decorative-line {
+    position: absolute;
+    bottom: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--cyan-glow) 50%,
+        transparent 100%
+    );
+}
+
+/* ─── HUD ─── */
+#hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: var(--spacing-md) var(--spacing-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    pointer-events: none;
+    z-index: 5;
+}
+
+#hud.hidden {
+    display: none;
+}
+
+.hud-left, .hud-right {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.hud-center {
+    position: absolute;
+    top: var(--spacing-md);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.hud-label {
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--text-muted);
+}
+
+#level-display {
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    letter-spacing: 0.3em;
+    color: var(--cyan-glow);
+    text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+}
+
+.lives-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+#lives-display {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.life {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    transition: var(--transition-fast);
+}
+
+.life.active {
+    color: var(--magenta-glow);
+    text-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
+}
+
+.timer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--spacing-xs);
+}
+
+#timer-display {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    letter-spacing: 0.1em;
+    color: var(--text-primary);
+}
+
+/* ─── Death Screen ─── */
+#death-screen {
+    background: radial-gradient(
+        ellipse at center,
+        rgba(255, 51, 102, 0.1) 0%,
+        rgba(10, 10, 15, 0.95) 70%
+    );
+}
+
+.death-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    color: var(--magenta-glow);
+    text-shadow: 0 0 30px rgba(255, 51, 102, 0.5);
+    margin-bottom: var(--spacing-md);
+}
+
+.death-message {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-lg);
+}
+
+.retry-hint {
+    font-size: 1rem;
+    color: var(--text-muted);
+}
+
+/* ─── Game Over Screen ─── */
+#gameover-screen {
+    background: radial-gradient(
+        ellipse at center,
+        rgba(255, 51, 102, 0.15) 0%,
+        rgba(10, 10, 15, 0.98) 70%
+    );
+}
+
+.gameover-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 6vw, 4rem);
+    font-weight: 900;
+    letter-spacing: 0.2em;
+    color: var(--magenta-glow);
+    text-shadow: 
+        0 0 20px rgba(255, 51, 102, 0.7),
+        0 0 40px rgba(255, 51, 102, 0.5);
+    margin-bottom: var(--spacing-md);
+    animation: gameoverPulse 2s ease-in-out infinite;
+}
+
+@keyframes gameoverPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.gameover-message {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* ─── Win Screen ─── */
+#win-screen {
+    background: radial-gradient(
+        ellipse at center,
+        rgba(0, 255, 136, 0.1) 0%,
+        rgba(10, 10, 15, 0.95) 70%
+    );
+}
+
+.win-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--green-glow);
+    text-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+    margin-bottom: var(--spacing-lg);
+}
+
+.stats {
+    display: flex;
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-lg);
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.stat-label {
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--text-primary);
+}
+
+.continue-hint, .restart-hint {
+    font-size: 1rem;
+    color: var(--text-muted);
+}
+
+/* ─── Victory Screen ─── */
+#victory-screen {
+    background: radial-gradient(
+        ellipse at center,
+        rgba(255, 215, 0, 0.1) 0%,
+        rgba(10, 10, 15, 0.95) 70%
+    );
+}
+
+.victory-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 7vw, 5rem);
+    font-weight: 900;
+    letter-spacing: 0.3em;
+    color: var(--gold-glow);
+    text-shadow: 
+        0 0 20px rgba(255, 215, 0, 0.5),
+        0 0 40px rgba(255, 215, 0, 0.3),
+        0 0 60px rgba(255, 215, 0, 0.2);
+    margin-bottom: var(--spacing-md);
+    animation: victoryGlow 2s ease-in-out infinite;
+}
+
+@keyframes victoryGlow {
+    0%, 100% { 
+        text-shadow: 
+            0 0 20px rgba(255, 215, 0, 0.5),
+            0 0 40px rgba(255, 215, 0, 0.3),
+            0 0 60px rgba(255, 215, 0, 0.2);
+    }
+    50% { 
+        text-shadow: 
+            0 0 30px rgba(255, 215, 0, 0.7),
+            0 0 50px rgba(255, 215, 0, 0.5),
+            0 0 80px rgba(255, 215, 0, 0.3);
+    }
+}
+
+.victory-message {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-lg);
+}
+
+.final-stats {
+    margin-bottom: var(--spacing-lg);
+}
+
+/* ─── Screen Content Wrapper ─── */
+.screen-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* ─── Responsive Design ─── */
+@media (max-width: 768px) {
+    #game-container {
+        padding: var(--spacing-sm);
+    }
+    
+    #hud {
+        padding: var(--spacing-sm);
+    }
+    
+    .logo {
+        letter-spacing: 0.15em;
+    }
+    
+    .subtitle {
+        letter-spacing: 0.3em;
+    }
+}
+
+/* ─── Utility Classes ─── */
+.hidden {
+    display: none !important;
+}
+
+.fade-in {
+    animation: fadeIn var(--transition-normal) ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.scale-in {
+    animation: scaleIn var(--transition-normal) ease-out;
+}
+
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="La Quento – Roll the Ball: A minimalist maze puzzle game with satisfying physics">
+    <title>La Quento – Roll the Ball</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Background ambient effects -->
+        <div class="ambient-glow"></div>
+        <div class="grid-overlay"></div>
+        
+        <!-- Main game canvas -->
+        <canvas id="gameCanvas"></canvas>
+        
+        <!-- UI Overlays -->
+        <div id="ui-overlay">
+            <!-- Start Screen -->
+            <div id="start-screen" class="screen active">
+                <div class="logo-container">
+                    <h1 class="logo">LA QUENTO</h1>
+                    <p class="subtitle">ROLL THE BALL</p>
+                </div>
+                <div class="menu-content">
+                    <p class="instruction pulse">Press <span class="key">ENTER</span> to Play</p>
+                    <p class="controls-hint">Use <span class="key">↑</span> <span class="key">↓</span> <span class="key">←</span> <span class="key">→</span> to move</p>
+                </div>
+                <div class="decorative-line"></div>
+            </div>
+            
+            <!-- HUD (visible during gameplay) -->
+            <div id="hud" class="hidden">
+                <div class="hud-left">
+                    <div class="lives-container">
+                        <span class="hud-label">LIVES</span>
+                        <div id="lives-display">
+                            <span class="life active">♦</span>
+                            <span class="life active">♦</span>
+                            <span class="life active">♦</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hud-center">
+                    <span id="level-display">LEVEL 1</span>
+                </div>
+                <div class="hud-right">
+                    <div class="timer-container">
+                        <span class="hud-label">TIME</span>
+                        <span id="timer-display">00:00</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Death Screen -->
+            <div id="death-screen" class="screen hidden">
+                <div class="screen-content">
+                    <h2 class="death-title">FALLEN</h2>
+                    <p class="death-message">You fell into the void...</p>
+                    <p class="retry-hint">Press <span class="key">R</span> to retry</p>
+                </div>
+            </div>
+            
+            <!-- Game Over Screen -->
+            <div id="gameover-screen" class="screen hidden">
+                <div class="screen-content">
+                    <h2 class="gameover-title">GAME OVER</h2>
+                    <p class="gameover-message">The darkness consumed you</p>
+                    <p class="retry-hint">Press <span class="key">ENTER</span> to restart</p>
+                </div>
+            </div>
+            
+            <!-- Win Screen -->
+            <div id="win-screen" class="screen hidden">
+                <div class="screen-content">
+                    <h2 class="win-title">LEVEL COMPLETE</h2>
+                    <div class="stats">
+                        <div class="stat">
+                            <span class="stat-label">Time</span>
+                            <span id="win-time" class="stat-value">00:00</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Lives</span>
+                            <span id="win-lives" class="stat-value">3</span>
+                        </div>
+                    </div>
+                    <p class="continue-hint">Press <span class="key">ENTER</span> to continue</p>
+                </div>
+            </div>
+            
+            <!-- Final Victory Screen -->
+            <div id="victory-screen" class="screen hidden">
+                <div class="screen-content">
+                    <h2 class="victory-title">VICTORY</h2>
+                    <p class="victory-message">You have conquered La Quento</p>
+                    <div class="final-stats">
+                        <div class="stat">
+                            <span class="stat-label">Total Time</span>
+                            <span id="total-time" class="stat-value">00:00</span>
+                        </div>
+                    </div>
+                    <p class="restart-hint">Press <span class="key">ENTER</span> to play again</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Modules -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
